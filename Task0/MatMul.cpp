@@ -31,6 +31,7 @@ int main(int argc, char const *argv[]) {
     std::vector<std::vector<float>> A, B, C;
 
     // Read input
+    std::cerr << "Enter m, n, k: ";
     int m, n, k;
     std::cin >> m >> n >> k;
 

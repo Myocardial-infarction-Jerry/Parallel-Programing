@@ -13,14 +13,10 @@ def matmul(A, B):
     return C
 
 if __name__ == "__main__":
-    if AUTO_GENERATE_TEST_CASES:
-        m = n = k = 512
-        A = [[random.random() for _ in range(n)] for _ in range(m)]
-        B = [[random.random() for _ in range(k)] for _ in range(n)]
-    else:
-        m, n, k = map(int, input().split())
-        A = [list(map(float, input().split())) for _ in range(m)]
-        B = [list(map(float, input().split())) for _ in range(n)]
+    print("Enter m, n, k: ")
+    m, n, k = map(int, input().split())
+    A = [[random.random() for _ in range(n)] for _ in range(m)]
+    B = [[random.random() for _ in range(k)] for _ in range(n)]
 
     # Multiply
     print(f"Calculating {m}*{n}*{k}")

@@ -8,9 +8,11 @@ std::vector<std::vector<float>> operator*(const std::vector<std::vector<float>> 
     std::vector<std::vector<float>> C(m, std::vector<float>(k, 0));
 
     for (int i = 0; i < m; i++)
-        for (int l = 0; l < n; l++)
+        for (int l = 0; l < n; l++) {
+            int a = A[i][l];
             for (int j = 0; j < k; j++)
-                C[i][j] += A[i][l] * B[l][j];
+                C[i][j] += a * B[l][j];
+        }
 
     return C;
 }
@@ -29,6 +31,7 @@ int main(int argc, char const *argv[]) {
     std::vector<std::vector<float>> A, B, C;
 
     // Read input
+    std::cerr << "Enter m, n, k: ";
     int m, n, k;
     std::cin >> m >> n >> k;
 
