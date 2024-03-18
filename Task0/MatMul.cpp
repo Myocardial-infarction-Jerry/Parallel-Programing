@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <fstream>
 
 #define AUTO_GENERATE_TEST_CASES 1
 
@@ -16,40 +17,34 @@ std::vector<std::vector<float>> operator*(const std::vector<std::vector<float>> 
     return C;
 }
 
+std::ostream &operator<<(std::ostream &out, const std::vector<std::vector<float>> &mat) {
+    for (auto &row : mat) {
+        for (auto &val : row)
+            out << val << " ";
+        out << std::endl;
+    }
+
+    return out;
+}
+
 int main(int argc, char const *argv[]) {
-    int m, n, k;
     std::vector<std::vector<float>> A, B, C;
 
     // Read input
-    if (AUTO_GENERATE_TEST_CASES) {
-        m = n = k = 512;
-        A = std::vector<std::vector<float>>(m, std::vector<float>(n));
-        B = std::vector<std::vector<float>>(n, std::vector<float>(k));
-        C = std::vector<std::vector<float>>(m, std::vector<float>(k));
+    int m, n, k;
+    std::cin >> m >> n >> k;
 
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                A[i][j] = (float)rand() / RAND_MAX;
+    A = std::vector<std::vector<float>>(m, std::vector<float>(n));
+    B = std::vector<std::vector<float>>(n, std::vector<float>(k));
+    C = std::vector<std::vector<float>>(m, std::vector<float>(k));
 
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < k; j++)
-                B[i][j] = (float)rand() / RAND_MAX;
-    }
-    else {
-        std::cin >> m >> n >> k;
-        A = std::vector<std::vector<float>>(m, std::vector<float>(n));
-        B = std::vector<std::vector<float>>(n, std::vector<float>(k));
-        C = std::vector<std::vector<float>>(m, std::vector<float>(k));
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < n; j++)
+            A[i][j] = (float)rand() / RAND_MAX;
 
-        for (int i = 0; i < m; i++)
-            for (int j = 0; j < n; j++)
-                std::cin >> A[i][j];
-
-        for (int i = 0; i < n; i++)
-            for (int j = 0; j < k; j++)
-                std::cin >> B[i][j];
-    }
-
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < k; j++)
+            B[i][j] = (float)rand() / RAND_MAX;
 
     // Multiply
     std::cerr << "Calculating " << m << "*" << n << "*" << k << std::endl;
@@ -62,6 +57,13 @@ int main(int argc, char const *argv[]) {
     std::cerr << "Multiplication time: " << duration.count() << " ms" << std::endl;
     float flops = (2.0 * m * n * k) / (duration.count() * 1e6);
     std::cerr << "Performance: " << flops << " GFLOPS" << std::endl;
+
+    // Output result
+    std::ofstream out("output.txt");
+    out << "Matrix A:" << std::endl << A << std::endl;
+    out << "Matrix B:" << std::endl << B << std::endl;
+    out << "Matrix C:" << std::endl << C << std::endl;
+    std::cerr << "Result in output.txt" << std::endl;
 
     return 0;
 }
