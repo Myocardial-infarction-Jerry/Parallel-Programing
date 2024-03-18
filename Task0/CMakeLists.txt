@@ -10,10 +10,12 @@ link_directories(/opt/intel/mkl/lib/intel64)
 
 # Regular compilation for MatMul
 add_executable(MatMul MatMul.cpp)
-
-# Add executable for each .cpp file
 add_executable(MatMul_Loop MatMul_Loop.cpp)
 add_executable(MatMul_LoopExtended MatMul_LoopExtended.cpp)
+
+# Compile MatMul_CompileOptimized with optimization flags
+add_executable(MatMul_CompileOptimized MatMul.cpp)
+target_compile_options(MatMul_CompileOptimized PRIVATE -O3)
 
 # Check if MKL library exists
 find_library(MKL_LIBRARY mkl_rt)

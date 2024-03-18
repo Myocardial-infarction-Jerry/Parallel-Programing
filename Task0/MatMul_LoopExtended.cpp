@@ -3,6 +3,7 @@
 #include <chrono>
 #include <fstream>
 
+// Function to perform matrix multiplication
 std::vector<std::vector<float>> operator*(const std::vector<std::vector<float>> &A, const std::vector<std::vector<float>> &B) {
     int m = A.size(), n = A[0].size(), k = B[0].size();
     std::vector<std::vector<float>> C(m, std::vector<float>(k, 0));
@@ -25,6 +26,7 @@ std::vector<std::vector<float>> operator*(const std::vector<std::vector<float>> 
     return C;
 }
 
+// Function to print matrix
 std::ostream &operator<<(std::ostream &out, const std::vector<std::vector<float>> &mat) {
     for (auto &row : mat) {
         for (auto &val : row)
@@ -47,15 +49,17 @@ int main(int argc, char const *argv[]) {
     B = std::vector<std::vector<float>>(n, std::vector<float>(k));
     C = std::vector<std::vector<float>>(m, std::vector<float>(k));
 
+    // Generate random values for matrix A
     for (int i = 0; i < m; i++)
         for (int j = 0; j < n; j++)
             A[i][j] = (float)rand() / RAND_MAX;
 
+    // Generate random values for matrix B
     for (int i = 0; i < n; i++)
         for (int j = 0; j < k; j++)
             B[i][j] = (float)rand() / RAND_MAX;
 
-    // Multiply
+    // Multiply matrices A and B
     std::cerr << "Calculating " << m << "*" << n << "*" << k << std::endl;
     auto start = std::chrono::high_resolution_clock::now();
     C = A * B;
@@ -67,7 +71,7 @@ int main(int argc, char const *argv[]) {
     float flops = (2.0 * m * n * k) / (duration.count() * 1e6);
     std::cerr << "Performance: " << flops << " GFLOPS" << std::endl;
 
-    // Output result
+    // Output result to a file
     std::ofstream out("output.txt");
     out << "Matrix A:" << std::endl << A << std::endl;
     out << "Matrix B:" << std::endl << B << std::endl;

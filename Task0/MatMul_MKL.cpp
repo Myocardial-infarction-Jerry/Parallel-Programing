@@ -4,6 +4,7 @@
 #include <mkl.h> 
 #include <fstream>
 
+// Function to perform matrix multiplication using Intel MKL
 std::vector<std::vector<float>> operator*(const std::vector<std::vector<float>> &A, const std::vector<std::vector<float>> &B) {
     // Get the dimensions of the matrices
     int m = A.size();
@@ -39,6 +40,7 @@ std::vector<std::vector<float>> operator*(const std::vector<std::vector<float>> 
     return C;
 }
 
+// Function to print matrix
 std::ostream &operator<<(std::ostream &out, const std::vector<std::vector<float>> &mat) {
     for (auto &row : mat) {
         for (auto &val : row)
