@@ -15,11 +15,13 @@ add_executable(MatMul MatMul.cpp)
 add_executable(MatMul_Loop MatMul_Loop.cpp)
 add_executable(MatMul_LoopExtended MatMul_LoopExtended.cpp)
 
-# Compilation with optimizations for MatMul
-add_executable(MatMul_CompileOptimized MatMul.cpp)
-target_compile_options(MatMul_CompileOptimized PRIVATE -O3)
-
-# Compilation with Intel MKL optimizations for MatMul
-add_executable(MatMul_MKL MatMul_MKL.cpp)
-target_compile_options(MatMul_MKL PRIVATE -O3)
-target_link_libraries(MatMul_MKL PRIVATE mkl_rt)
+# Check if MKL library exists
+find_library(MKL_LIBRARY mkl_rt)
+if(MKL_LIBRARY)
+    # Compilation with Intel MKL optimizations for MatMul
+    add_executable(MatMul_MKL MatMul_MKL.cpp)
+    target_compile_options(MatMul_MKL PRIVATE -O3)
+    target_link_libraries(MatMul_MKL PRIVATE ${MKL_LIBRARY})
+else()
+    message(WARNING "MKL library not found. MatMul_MKL will not be compiled.")
+endif()
