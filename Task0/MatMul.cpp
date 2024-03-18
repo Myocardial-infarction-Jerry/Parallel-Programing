@@ -3,8 +3,6 @@
 #include <chrono>
 #include <fstream>
 
-#define AUTO_GENERATE_TEST_CASES 1
-
 std::vector<std::vector<float>> operator*(const std::vector<std::vector<float>> &A, const std::vector<std::vector<float>> &B) {
     int m = A.size(), n = A[0].size(), k = B[0].size();
     std::vector<std::vector<float>> C(m, std::vector<float>(k, 0));
