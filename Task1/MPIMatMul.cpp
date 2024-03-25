@@ -26,7 +26,6 @@ int main(int argc, char const *argv[]) {
 
     if (rank == 0) {
         int m, n, k;
-        // m = n = k = 512;
         std::cin >> m >> n >> k;
         std::cerr << "Calculating for m = " << m << ", n = " << n << ", k = " << k << std::endl;
         std::cerr << "Running on " << size << " processes\n";
@@ -39,20 +38,30 @@ int main(int argc, char const *argv[]) {
 
         auto matMulBeginTime = MPI_Wtime();
 
+        // Core 0 
         int subM = (m + size - 1) / size;
+        std::cerr << "subM = " << subM << std::endl;
         matMul(A, B, C, subM, n, k);
 
+        // Core 1 ~ size - 1
         for (int i = 1; i < size; ++i) {
+            if (subM * i >= m)
+                break;
+
+            int rem = std::min(subM, m - subM * i);
+
             MPI_Send(&subM, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
             MPI_Send(&n, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
             MPI_Send(&k, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
-            MPI_Send(&A[subM * i * n], subM * n, MPI_FLOAT, i, 0, MPI_COMM_WORLD);
+            MPI_Send(&A[subM * i * n], rem * n, MPI_FLOAT, i, 0, MPI_COMM_WORLD);
             MPI_Send(B, n * k, MPI_FLOAT, i, 0, MPI_COMM_WORLD);
         }
 
         for (int i = 1; i < size; ++i) {
+            if (subM * i >= m)
+                break;
+
             MPI_Recv(&C[subM * i * k], subM * k, MPI_FLOAT, i, 0, MPI_COMM_WORLD, &status);
-            std::cerr << "Received from " << i << std::endl;
         }
 
         auto matMulEndTime = MPI_Wtime();
