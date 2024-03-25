@@ -43,7 +43,7 @@ int main(int argc, char const *argv[]) {
         std::cerr << "subM = " << subM << std::endl;
         matMul(A, B, C, subM, n, k);
 
-        // Core 1 ~ size - 1
+        // Core 1 ~ size
         for (int i = 1; i < size; ++i) {
             if (subM * i >= m)
                 break;
