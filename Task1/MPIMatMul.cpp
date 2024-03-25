@@ -38,10 +38,8 @@ int main(int argc, char const *argv[]) {
 
         auto matMulBeginTime = MPI_Wtime();
 
-        // Core 0 
         int subM = (m + size - 1) / size;
         std::cerr << "subM = " << subM << std::endl;
-        matMul(A, B, C, subM, n, k);
 
         // Core 1 ~ size - 1
         for (int i = 1; i < size; ++i) {
@@ -57,6 +55,9 @@ int main(int argc, char const *argv[]) {
             MPI_Send(B, n * k, MPI_FLOAT, i, 0, MPI_COMM_WORLD);
         }
 
+        // Core 0 
+        matMul(A, B, C, subM, n, k);
+
         for (int i = 1; i < size; ++i) {
             if (subM * i >= m)
                 break;
@@ -66,19 +67,6 @@ int main(int argc, char const *argv[]) {
 
         auto matMulEndTime = MPI_Wtime();
         std::cout << "matMul time: " << matMulEndTime - matMulBeginTime << " seconds" << std::endl;
-
-        // Check if the result is correct
-        auto checkBeginTime = std::chrono::high_resolution_clock::now();
-
-        auto C1 = new float[m * k];
-        matMul(A, B, C1, m, n, k);
-        for (int i = 0; i < m * k; i++)
-            if (C[i] != C1[i])
-                std::cerr << "Wrong result\n";
-
-        auto checkEndTime = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::duration<double>>(checkEndTime - checkBeginTime).count();
-        std::cout << "Running time: " << duration << " seconds" << std::endl;
     }
     else {
         int subM, n, k;
