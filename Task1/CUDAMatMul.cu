@@ -56,20 +56,7 @@ int main(int argc, char const *argv[]) {
     cudaFree(d_B);
     cudaFree(d_C);
 
-    std::cout << "Running time: " << milliseconds << " ms" << std::endl;
+    std::cout << "Running time: " << milliseconds / 1000 << " seconds" << std::endl;
 
     return 0;
-}
-
-dim3 threadsPerBlock(16, 16);
-dim3 numBlocks(size / threadsPerBlock.x, size / threadsPerBlock.y);
-matMul << <numBlocks, threadsPerBlock >> > (d_A, d_B, d_C, size);
-
-cudaMemcpy(C, d_C, size *size * sizeof(float), cudaMemcpyDeviceToHost);
-
-cudaFree(d_A);
-cudaFree(d_B);
-cudaFree(d_C);
-
-return 0;
 }

@@ -4,19 +4,18 @@ project(MPIMatMul)
 set(CMAKE_CXX_COMPILER mpic++)
 set(CMAKE_CXX_STANDARD 14)
 
+# BEGIN: Add CUDA support
+set(CMAKE_CUDA_ARCHITECTURES 86)
+find_package(CUDA REQUIRED)
+include_directories(${CUDA_INCLUDE_DIRS})
+
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -std=c++14)
+
+cuda_add_executable(CUDAMatMul CUDAMatMul.cu)
+target_link_libraries(CUDAMatMul ${CUDA_LIBRARIES})
+# END: Add CUDA support
+
 find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 
 add_executable(MPIMatMul MPIMatMul.cpp)
-
-# Get the number of available cores
-include(ProcessorCount)
-ProcessorCount(N)
-if(NOT N EQUAL 0)
-    # Set the number of MPI processes to the number of available cores
-    set(MPIEXEC_NUMPROC_FLAG "-n")
-    set(MPIEXEC_MAX_NUMPROCS ${N})
-    set(MPIEXEC_PREFLAGS "${MPIEXEC_NUMPROC_FLAG} ${MPIEXEC_MAX_NUMPROCS}")
-    set_target_properties(MPIMatMul PROPERTIES
-        MPIEXEC_PREFLAGS "${MPIEXEC_PREFLAGS}")
-endif()
