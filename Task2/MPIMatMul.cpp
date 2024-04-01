@@ -39,8 +39,7 @@ int main(int argc, char const *argv[]) {
 
     if (rank == MASTER_RANK) {
         // Set the matrix dimensions
-        // std::cin >> M >> n >> k;
-        std::cin >> M; n = k = M;
+        std::cin >> M >> n >> k;
         std::cerr << "Calculating for m = " << M << ", n = " << n << ", k = " << k << std::endl;
         std::cerr << "Running on " << size << " processes\n";
 
