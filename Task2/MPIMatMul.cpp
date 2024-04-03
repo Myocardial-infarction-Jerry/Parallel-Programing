@@ -130,5 +130,11 @@ int main(int argc, char const *argv[]) {
     // Finalize MPI
     MPI_Finalize();
 
+    // Call Python script to verify
+    if (rank == MASTER_RANK) {
+        std::cerr << "Verifying with Python script" << std::endl;
+        std::system("python3 PythonMatMul.py");
+    }
+
     return 0;
 }
