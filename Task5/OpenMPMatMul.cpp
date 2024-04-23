@@ -4,34 +4,35 @@
 #include <nlohmann/json.hpp>
 #include <omp.h>
 
-#define NUM_THREADS 16
+int num_thread;
 
 void matMul(float *A, float *B, float *C, int m, int n, int k) {
-#pragma omp parallel for num_threads(NUM_THREADS)
     for (int i = 0; i < m; ++i) {
         for (int j = 0; j < k; ++j) {
             float sum = 0.0f;
-            for (int l = 0; l < n; ++l) {
-                sum += A[i * n + l] * B[l * k + j];
-            }
+#pragma omp parallel for num_threads(num_thread) reduction(+:sum)
+            // #pragma omp parallel for num_threads(num_thread) reduction(+:sum) schedule(static, 16)
+            // #pragma omp parallel for num_threads(num_thread) reduction(+:sum) schedule(dynamic, 16)
+            for (int l = 0; l < n; ++l) sum += A[i * n + l] * B[l * k + j];
             C[i * k + j] = sum;
         }
     }
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        std::cerr << "Usage: " << argv[0] << " <m> <n> <k>" << std::endl;
+    if (argc != 5) {
+        std::cerr << "Usage: " << argv[0] << " <m> <n> <k> <threads>" << std::endl;
         return 1;
     }
 
     // Get the values of m, n, and k from the command line
     int m = atoi(argv[1]), n = atoi(argv[2]), k = atoi(argv[3]);
+    num_thread = atoi(argv[4]);
     std::cerr << "Calculating for m = " << m << ", n = " << n << ", k = " << k << std::endl;
 
     // Set the number of threads
 
-    std::cerr << "Running on " << NUM_THREADS << " threads\n";
+    std::cerr << "Running on " << num_thread << " threads\n";
 
     // Allocate memory for matrices A, B, and C
     float *A = new float[m * n];
