@@ -1,0 +1,7 @@
+CMakeFiles/
+
+.DS_Store
+*.cmake
+CMakeCache.txt
+Makefile
+output.*
