@@ -1,6 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+
+import matplotlib.pyplot as plt
 
 # 进程数量
 processes = np.array([1, 2, 4, 8, 16])
@@ -35,6 +36,10 @@ ax.set_xlabel('Matrix Size')
 ax.set_ylabel('Processes')
 ax.set_zlabel('Time (s)')
 ax.view_init(30, 120)
+
+# 设置x和y轴的刻度为给定的数据值
+ax.set_xticks(sizes)
+ax.set_yticks(processes)
 
 # 显示图形
 plt.savefig('pics.png', dpi=300)
