@@ -1,0 +1,10 @@
+CMakeFiles/
+Testing/
+bin/
+
+.DS_Store
+*.cmake
+CMakeCache.txt
+Makefile
+output.*
+lib*
