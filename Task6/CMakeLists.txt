@@ -54,3 +54,15 @@ target_link_libraries(VecAdd parallel_for nlohmann_json::nlohmann_json)
 target_link_libraries(MatMul parallel_for nlohmann_json::nlohmann_json)
 target_link_libraries(HeatedPlate parallel_for nlohmann_json::nlohmann_json)
 target_link_libraries(HeatedPlateOpenMP OpenMP::OpenMP_CXX)
+
+# Enable testing
+enable_testing()
+
+# Add tests
+set(VALUES 128 256 512 1024 2048)
+set(THREADS_VALUES 1 2 4 8 16)
+foreach(threads ${THREADS_VALUES})
+    foreach(val ${VALUES})
+        add_test(NAME Test_${val}_${threads} COMMAND MatMul ${val} ${threads})
+    endforeach()
+endforeach()
