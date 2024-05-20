@@ -1,8 +1,9 @@
 .vscode/
 CMakeFiles/
 bin/
+Testing/
 
 Makefile
-cmake_install.cmake
+*.cmake
 CMakeCache.txt
 compile_commands.json

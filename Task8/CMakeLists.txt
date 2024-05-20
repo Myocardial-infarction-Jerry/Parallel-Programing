@@ -25,3 +25,15 @@ foreach(source ${SOURCES})
     get_filename_component(name ${source} NAME_WE)
     add_executable(${name} ${source})
 endforeach()
+
+# Enable Testing
+enable_testing()
+
+# Add test
+set(VALUES 1 2 4 8 16)
+set(DATASETS "datasets/updated_flower.csv" "datasets/updated_mouse.csv")
+foreach(dataset ${DATASETS})
+    foreach(val ${VALUES})
+        add_test(NAME Test_${dataset}_${val} COMMAND ShortestPath ${dataset} ${val})
+    endforeach()
+endforeach()

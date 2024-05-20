@@ -35,6 +35,7 @@ private:
     void dijkstra(Node *start) {
         std::priority_queue<std::pair<int, Node *>, std::vector<std::pair<int, Node *>>, std::greater<std::pair<int, Node *>>> pq;
         auto &distance = start->distance;
+        distance.clear();
 
         pq.push({ 0, start });
         distance[start] = 0;
@@ -75,34 +76,57 @@ public:
         }
     }
 
-    void solveShortestPath(bool parallel = true) {
-        if (!parallel) {
+    enum class Mode {
+        PARALLEL,
+        SEQUENTIAL
+    };
+
+    void solveShortestPath(const int &threadsLimit = 8, Mode mode = Mode::PARALLEL) {
+        if (mode == Mode::SEQUENTIAL) {
             for (auto &node : nodes)
                 dijkstra(node.second);
 
             return;
         }
 
+        // std::vector<std::thread> threads;
+        // for (auto &node : nodes)
+        //     threads.push_back(std::thread(&DirectedGraph::dijkstra, this, node.second));
+
+        // for (auto &thread : threads)
+        //     thread.join();
+
         std::vector<std::thread> threads;
-        for (auto &node : nodes)
+        int threadsCount = 0;
+        for (auto &node : nodes) {
             threads.push_back(std::thread(&DirectedGraph::dijkstra, this, node.second));
+            threadsCount++;
+            if (threadsCount == threadsLimit) {
+                for (auto &thread : threads)
+                    thread.join();
+                threads.clear();
+                threadsCount = 0;
+            }
+        }
 
         for (auto &thread : threads)
             thread.join();
+        threads.clear();
     }
 };
 
 int main(int argc, char const *argv[]) {
-    if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <csv_path>" << std::endl;
+    if (argc != 3) {
+        std::cerr << "Usage: " << argv[0] << " <csv_path> <threads>" << std::endl;
         return 1;
     }
 
     auto graph = DirectedGraph(argv[1]);
+    int threadsLimit = std::atoi(argv[2]);
 
     auto beginTime = std::chrono::high_resolution_clock::now();
 
-    graph.solveShortestPath();
+    graph.solveShortestPath(threadsLimit);
 
     auto endTime = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
@@ -110,7 +134,7 @@ int main(int argc, char const *argv[]) {
 
     beginTime = std::chrono::high_resolution_clock::now();
 
-    graph.solveShortestPath(false);
+    graph.solveShortestPath(threadsLimit, DirectedGraph::Mode::SEQUENTIAL);
 
     endTime = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
