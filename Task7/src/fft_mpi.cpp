@@ -62,7 +62,6 @@ void FFT(std::vector<std::complex<double>> &a, int sign = 1) {
             if (i < rev)
                 std::swap(a[i], a[rev]);
         }
-        // std::cout << "Reversed\n";
     }
 
     for (int s = 1; s <= ln2; ++s) {
@@ -71,7 +70,9 @@ void FFT(std::vector<std::complex<double>> &a, int sign = 1) {
         std::complex<double> wm(cos(-2 * PI * sign / m), sin(-2 * PI * sign / m));
 
         MPI_Bcast(a.data(), n, MPI_DOUBLE_COMPLEX, 0, MPI_COMM_WORLD);
-        MPI_Barrier(MPI_COMM_WORLD);
+        int bufferSize = 0, position = 0;
+        MPI_Pack_size(n, MPI_CXX_DOUBLE_COMPLEX, MPI_COMM_WORLD, &bufferSize);
+        auto buffer = new char[bufferSize];
 
         for (int j = rank * m; j < n; j += size * m) {
             std::complex<double> w(1, 0);
@@ -83,18 +84,25 @@ void FFT(std::vector<std::complex<double>> &a, int sign = 1) {
                 w *= wm;
             }
 
-            MPI_Send(a.data() + j, m, MPI_DOUBLE_COMPLEX, 0, 0, MPI_COMM_WORLD);
+            MPI_Pack(a.data() + j, m, MPI_DOUBLE_COMPLEX, buffer, bufferSize, &position, MPI_COMM_WORLD);
         }
 
-        // std::cout << "Rank " << rank << " done.\n";
+        if (rank)
+            MPI_Send(buffer, bufferSize, MPI_PACKED, 0, 0, MPI_COMM_WORLD);
 
         if (rank == 0) {
-            for (int i = 1; i < size; ++i)
-                for (int j = i * m; j < n; j += size * m) {
-                    MPI_Recv(a.data() + j, m, MPI_DOUBLE_COMPLEX, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-                }
-            // std::cout << "s=" << s << " done.\n";
+            for (int i = 0; i < size; ++i) {
+                if (i)
+                    MPI_Recv(buffer, bufferSize, MPI_PACKED, i, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+                position = 0;
+
+                for (int j = i * m; j < n; j += size * m)
+                    MPI_Unpack(buffer, bufferSize, &position, a.data() + j, m, MPI_DOUBLE_COMPLEX, MPI_COMM_WORLD);
+            }
         }
+
+        delete[] buffer;
     }
 
     if (rank == 0 && sign == -1)
@@ -125,7 +133,7 @@ int main(int argc, char const *argv[]) {
             << "\n"
             << "    FFT ( FFT ( X(1:N) ) ) == N * X(1:N)\n"
             << "\n"
-            << "             N      NITS    Error         Time          Time/Call     MFLOPS\n"
+            << "             N      NITS    Error            Time       Time/Call     MFLOPS\n"
             << "\n";
     }
 
@@ -140,11 +148,11 @@ int main(int argc, char const *argv[]) {
 
         if (rank == 0) {
             for (int i = 0; i < n; ++i)
-                timeDomain[i] = timeDomainCopy[i] = std::complex<double>(i, 0);
+                timeDomain[i] = timeDomainCopy[i] = std::complex<double>(frand(seed), 0);
         }
 
         FFT(timeDomain, 1);
-        // FFT(timeDomain, -1);
+        FFT(timeDomain, -1);
 
         if (rank == 0) {
             double err = 0.0;
@@ -163,16 +171,16 @@ int main(int argc, char const *argv[]) {
         auto cTime1 = cpuTime();
 
         for (int it = 0; it < nits; ++it) {
-            // FFT(timeDomain, 1);
-            // FFT(timeDomain, -1);
+            FFT(timeDomain, 1);
+            FFT(timeDomain, -1);
         }
 
         auto cTime2 = cpuTime();
         auto cTime = cTime2 - cTime1;
 
         if (rank == 0) {
-            auto flops = 2.0 * nits * n * ln2 / cTime / 1.0E+6;
-            auto mFlops = 1.0E-6 * flops;
+            auto flops = 2.0 * (double)nits * (5.0 * (double)n * (double)ln2);
+            auto mFlops = 1.0E-6 * flops / cTime;
 
             std::cout
                 << "  " << std::setw(12) << cTime
