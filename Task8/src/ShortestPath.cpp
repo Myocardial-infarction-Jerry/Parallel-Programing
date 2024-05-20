@@ -7,7 +7,7 @@
 #include "csv.h"
 
 class DirectedGraph {
-private:
+protected:
     class Node;
     class Edge;
 
@@ -40,12 +40,20 @@ private:
         pq.push({ 0, start });
         distance[start] = 0;
 
+        int count = 0, size = nodes.size();
+
         while (!pq.empty()) {
             auto [dist, node] = pq.top();
             pq.pop();
 
             if (distance.find(node) != distance.end() && dist > distance[node])
                 continue;
+
+            distance[node] = dist;
+            count++;
+
+            if (count == size)
+                break;
 
             for (auto edge = node->finalEdge; edge != nullptr; edge = edge->nextEdge) {
                 double newDist = dist + edge->distance;
@@ -115,13 +123,34 @@ public:
     }
 };
 
+class UndirectedGraph : public DirectedGraph {
+public:
+    UndirectedGraph() = default;
+    UndirectedGraph(const std::string &csv_path) {
+        io::CSVReader<3> in(csv_path);
+        in.read_header(io::ignore_extra_column, "source", "target", "distance");
+        std::string source; std::string target; double distance;
+        while (in.read_row(source, target, distance)) {
+            if (nodes.find(source) == nodes.end())
+                nodes[source] = new Node(source);
+
+            if (nodes.find(target) == nodes.end())
+                nodes[target] = new Node(target);
+
+            nodes[source]->finalEdge = new Edge(nodes[target], distance, nodes[source]->finalEdge);
+            nodes[target]->finalEdge = new Edge(nodes[source], distance, nodes[target]->finalEdge);
+        }
+    }
+};
+
+
 int main(int argc, char const *argv[]) {
     if (argc != 3) {
         std::cerr << "Usage: " << argv[0] << " <csv_path> <threads>" << std::endl;
         return 1;
     }
 
-    auto graph = DirectedGraph(argv[1]);
+    auto graph = UndirectedGraph(argv[1]);
     int threadsLimit = std::atoi(argv[2]);
 
     auto beginTime = std::chrono::high_resolution_clock::now();
@@ -134,7 +163,7 @@ int main(int argc, char const *argv[]) {
 
     beginTime = std::chrono::high_resolution_clock::now();
 
-    graph.solveShortestPath(threadsLimit, DirectedGraph::Mode::SEQUENTIAL);
+    graph.solveShortestPath(threadsLimit, UndirectedGraph::Mode::SEQUENTIAL);
 
     endTime = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
