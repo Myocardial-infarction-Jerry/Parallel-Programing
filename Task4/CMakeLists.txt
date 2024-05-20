@@ -1,11 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
-project(PthreadEquation)
+project(MyProject)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(PthreadEquation PthreadEquation.cpp)
-add_executable(PthreadMonteCarlo PthreadMonteCarlo.cpp)
+# Specify the directory where the source files are
+set(SOURCE_DIR src)
 
-find_package(Threads REQUIRED)
-target_link_libraries(PthreadEquation Threads::Threads)
-target_link_libraries(PthreadMonteCarlo Threads::Threads)
+# Specify the directory where the executable files will be generated
+set(EXECUTABLE_OUTPUT_PATH bin)
+
+# Get all source files
+file(GLOB SOURCES "${SOURCE_DIR}/*.cpp")
+
+# For each source file, create an executable
+foreach(source ${SOURCES})
+    get_filename_component(name ${source} NAME_WE)
+    add_executable(${name} ${source})
+endforeach()

@@ -1,5 +1,7 @@
 CMakeFiles/
+.vscode/
 Testing/
+bin/
 
 .DS_Store
 *.cmake

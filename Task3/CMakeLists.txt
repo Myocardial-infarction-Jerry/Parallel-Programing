@@ -1,13 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
-project(PthreadProject)
+project(MyProject)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
-find_package(nlohmann_json 3.2.0 REQUIRED)
-find_package(Threads REQUIRED)
+# Specify the directory where the source files are
+set(SOURCE_DIR src)
 
-add_executable(PthreadMatMul PthreadMatMul.cpp)
-add_executable(PthreadVecSum PthreadVecSum.cpp)
+# Specify the directory where the executable files will be generated
+set(EXECUTABLE_OUTPUT_PATH bin)
 
-target_link_libraries(PthreadMatMul PRIVATE nlohmann_json::nlohmann_json Threads::Threads)
-target_link_libraries(PthreadVecSum PRIVATE nlohmann_json::nlohmann_json Threads::Threads)
+# Get all source files
+file(GLOB SOURCES "${SOURCE_DIR}/*.cpp")
+
+# For each source file, create an executable
+foreach(source ${SOURCES})
+    get_filename_component(name ${source} NAME_WE)
+    add_executable(${name} ${source})
+endforeach()

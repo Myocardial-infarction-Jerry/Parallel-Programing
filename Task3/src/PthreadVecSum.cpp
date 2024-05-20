@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 
     // Verify the result with Python script
     std::cerr << "Verifying with Python script" << std::endl;
-    std::system("python3 PythonVecSum.py");
+    std::system("python3 src/PythonVecSum.py");
 
     return 0;
 }

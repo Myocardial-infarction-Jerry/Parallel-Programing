@@ -2,7 +2,7 @@ import json
 import numpy as np
 import os
 
-path=os.path.dirname(os.path.abspath(__file__))+'/'
+path=os.path.dirname(os.path.abspath(__file__))+'/../'
 with open(path+'output.json','r') as f:
     data=json.load(f)
     

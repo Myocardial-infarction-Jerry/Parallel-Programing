@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
 
     // Verify the result with Python script
     std::cerr << "Verifying with Python script" << std::endl;
-    std::system("python3 PythonMatMul.py");
+    std::system("python3 src/PythonMatMul.py");
 
     return 0;
 }

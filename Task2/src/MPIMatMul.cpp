@@ -133,7 +133,7 @@ int main(int argc, char const *argv[]) {
     // Call Python script to verify
     if (rank == MASTER_RANK) {
         std::cerr << "Verifying with Python script" << std::endl;
-        std::system("python3 PythonMatMul.py");
+        std::system("python3 src/PythonMatMul.py");
     }
 
     return 0;
