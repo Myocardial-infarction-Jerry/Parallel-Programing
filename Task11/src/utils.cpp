@@ -98,4 +98,48 @@ void Kernel::loadKernel(const char *filename) {
 
     for (int i = 0; i < height * width * channels; i++)
         data[i] /= sum;
-} 
+}
+
+Layer::Layer(const Layer &layer) {
+    height = layer.height;
+    width = layer.width;
+    channels = layer.channels;
+    data = new float[height * width * channels];
+    for (int i = 0; i < height * width * channels; i++)
+        data[i] = layer.data[i];
+}
+
+Layer &Layer::operator=(const Layer &layer) {
+    if (this != &layer) {
+        delete[] data;
+        height = layer.height;
+        width = layer.width;
+        channels = layer.channels;
+        data = new float[height * width * channels];
+        for (int i = 0; i < height * width * channels; i++)
+            data[i] = layer.data[i];
+    }
+    return *this;
+}
+
+Kernel::Kernel(const Kernel &kernel) {
+    height = kernel.height;
+    width = kernel.width;
+    channels = kernel.channels;
+    data = new float[height * width * channels];
+    for (int i = 0; i < height * width * channels; i++)
+        data[i] = kernel.data[i];
+}
+
+Kernel &Kernel::operator=(const Kernel &kernel) {
+    if (this != &kernel) {
+        delete[] data;
+        height = kernel.height;
+        width = kernel.width;
+        channels = kernel.channels;
+        data = new float[height * width * channels];
+        for (int i = 0; i < height * width * channels; i++)
+            data[i] = kernel.data[i];
+    }
+    return *this;
+}

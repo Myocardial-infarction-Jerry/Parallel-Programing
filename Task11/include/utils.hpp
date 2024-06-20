@@ -7,6 +7,8 @@ public:
     float *data;
 
     Layer();
+    Layer(const Layer &layer);
+    Layer &operator=(const Layer &layer);
     Layer(int height, int width, int channels);
     ~Layer();
 
@@ -19,6 +21,8 @@ public:
     float *data;
 
     Kernel();
+    Kernel(const Kernel &kernel);
+    Kernel &operator=(const Kernel &kernel);
     Kernel(int height, int width, int channels);
     ~Kernel();
 
